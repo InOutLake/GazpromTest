@@ -1,13 +1,14 @@
 services:
 
-  web_api:
-    build: ./App
+  web-api:
+    build:
+        context: ./App
+        dockerfile: ./Dockerfile
     volumes:
-      - .:/app
-      - ./App/.uvicornignore:/app/.uvicornignore
+      - ./App:/app
     ports:
       - 8000:8000
-    command: uvicorn App.src.main:app --reload --host=0.0.0.0 --port=8000
+    command: uvicorn src.main:app --reload --host=0.0.0.0 --port=8000
     depends_on:
       db:
         condition: service_healthy
@@ -40,5 +41,6 @@ services:
       - 8080:8080
 
 volumes:
+  web-api:
   db-data:
 

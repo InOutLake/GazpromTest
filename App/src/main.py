@@ -5,6 +5,7 @@ from .schema_models import *
 from .helpers import *
 from . import statistic_calculations as sc
 from typing import List
+import json
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -29,6 +30,8 @@ async def create_device():
 @app.post('/data/', response_model=CreateData)
 async def create_data(data: CreateData):
     new_data = Data(**data.model_dump())
+    if not device_exists(db, new_data.device_id):
+        raise HTTPException(status_code=404, detail='Device with such ID is not registered')
     db.add(new_data)
     db.commit()
     db.refresh(new_data)
@@ -48,19 +51,20 @@ async def statistic(
         ):
     
     if not device_exists(db, device_id):
-        raise HTTPException('Device with such ID is not registered')
+        raise HTTPException(status_code=404, detail='Device with such ID is not registered')
     
     data = db.query(Data).\
                 filter(
                     Data.device_id == device_id and
                     Data.recieve_timestamp > start_time and 
-                    Data.recieve_timestamp < end_time
+                    Data.recieve_timestamp < end_time       # TODO time filter does not work
                 ).\
                 with_entities(Data.x, Data.y, Data.z)\
                 .all()
-    if not data:
-        return None
     
+    if not data:
+        raise HTTPException(status_code=404, detail=f'Data from device with id={device_id} have not been found')
+
     statistics = {}
     statistic_functions = {
         'max_value': sc.max_values,
@@ -69,19 +73,12 @@ async def statistic(
         'sum': sc.summs,
         'count': sc.counts
     }
-
     for key, func in statistic_functions.items():
         if locals()[key]:
             result = func(data)
-            if isinstance(result, dict):
-                for sub_key, sub_value in result.items():
-                    statistics.setdefault(f"{key}_{sub_key}", sub_value) #TODO json dump
-            else:
-                statistics.setdefault(key, result)
+            statistics.setdefault(key, result)
     return statistics
-
 
 if __name__ == '__main__': 
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-

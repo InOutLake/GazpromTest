@@ -8,22 +8,12 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-
-RUN apt-get update && \
+RUN pwd && ls && \
+    apt-get update && \
     apt-get install -y libpq-dev gcc
 
-COPY requirements.txt .
+COPY . .
+
 RUN python -m pip install -r requirements.txt
 
-USER appuser
-COPY src /app
 EXPOSE  8000
