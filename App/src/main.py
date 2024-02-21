@@ -1,7 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from .models import Device, Data
 from .schema_models import *
+from .helpers import *
+from . import statistic_calculations as sc
+from typing import List
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -23,26 +26,62 @@ async def create_device():
     db.refresh(new_device)
     return new_device
 
-@app.get('/data/{device_id}')
-async def device_data(device_id: int):
-    device = db.query(Device).filter(Device.device_id == device_id).first()
-    if device is None:
-        raise HTTPException(status_code=404, detail="Device not found")
-    else:
-        data = db.query(Data).filter(Data.device_id == device_id).limit(10).all()
-    return {"device": device, "data": data}
-
 @app.post('/data/', response_model=CreateData)
-async def create_data(data=CreateData):
-    return data
+async def create_data(data: CreateData):
+    new_data = Data(**data.model_dump())
+    db.add(new_data)
+    db.commit()
+    db.refresh(new_data)
+    return new_data
+
 
 @app.get('/statistic/')
-async def statistic(maxval: bool=True, minval: bool=True,
-                            median: bool=True): #TODO add time
-    return {'message': 'all calculations will be here'}
+async def statistic(
+            device_id: int,
+            max_value: bool = True, 
+            min_value: bool = True, 
+            median: bool = True, 
+            sum: bool = True, 
+            count: bool = True, 
+            start_time: datetime = datetime(year=2024, month=2, day=19, tzinfo=timezone(TIMEZONE)), 
+            end_time: datetime = datetime.now(timezone(TIMEZONE))
+        ):
+    
+    if not device_exists(db, device_id):
+        raise HTTPException('Device with such ID is not registered')
+    
+    data = db.query(Data).\
+                filter(
+                    Data.device_id == device_id and
+                    Data.recieve_timestamp > start_time and 
+                    Data.recieve_timestamp < end_time
+                ).\
+                with_entities(Data.x, Data.y, Data.z)\
+                .all()
+    if not data:
+        return None
+    
+    statistics = {}
+    statistic_functions = {
+        'max_value': sc.max_values,
+        'min_value': sc.min_values,
+        'median': sc.medians,
+        'sum': sc.summs,
+        'count': sc.counts
+    }
+
+    for key, func in statistic_functions.items():
+        if locals()[key]:
+            result = func(data)
+            if isinstance(result, dict):
+                for sub_key, sub_value in result.items():
+                    statistics.setdefault(f"{key}_{sub_key}", sub_value) #TODO json dump
+            else:
+                statistics.setdefault(key, result)
+    return statistics
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
