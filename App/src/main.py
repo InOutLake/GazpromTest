@@ -55,8 +55,8 @@ async def statistic(
     
     data = db.query(Data).\
                 filter(
-                    Data.device_id == device_id and
-                    Data.recieve_timestamp > start_time and 
+                    Data.device_id == device_id,
+                    Data.recieve_timestamp > start_time,
                     Data.recieve_timestamp < end_time       # TODO time filter does not work
                 ).\
                 with_entities(Data.x, Data.y, Data.z)\
