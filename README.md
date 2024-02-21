@@ -27,8 +27,9 @@ Statistic can be accessed on HOST:/statistic/ with parameters:
 
 More info about the methods can be found here: HOST:/docs/
 
+Locust stress test info csv files saved at StressTest.
 
-# GazpromTest
+
 ### RUS
 #### Общая информация
 **Внимание!**
@@ -56,3 +57,5 @@ More info about the methods can be found here: HOST:/docs/
 - `count:bool` - будут ли подсчитаны данные
 
 Более подробную информацию о методах можно найти здесь: HOST:/docs/
+
+Файлы с результатами стресс-теста находятся в StressTest
