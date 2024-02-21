@@ -5,7 +5,7 @@ from .schema_models import *
 from .helpers import *
 from . import statistic_calculations as sc
 from typing import List
-import json
+
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -57,7 +57,7 @@ async def statistic(
                 filter(
                     Data.device_id == device_id,
                     Data.recieve_timestamp > start_time,
-                    Data.recieve_timestamp < end_time       # TODO time filter does not work
+                    Data.recieve_timestamp < end_time
                 ).\
                 with_entities(Data.x, Data.y, Data.z)\
                 .all()
