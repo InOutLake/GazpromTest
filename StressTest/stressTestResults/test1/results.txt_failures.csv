@@ -1,0 +1,5 @@
+Method,Name,Error,Occurrences
+POST,/data/,"ConnectionAbortedError(10053, 'Программа на вашем хост-компьютере разорвала установленное подключение', None, 10053, None)",3716
+POST,/data/,"ConnectionResetError(10054, 'Удаленный хост принудительно разорвал существующее подключение', None, 10054, None)",331
+GET,/statistic/,"ConnectionAbortedError(10053, 'Программа на вашем хост-компьютере разорвала установленное подключение', None, 10053, None)",4109
+GET,/statistic/,"ConnectionResetError(10054, 'Удаленный хост принудительно разорвал существующее подключение', None, 10054, None)",807

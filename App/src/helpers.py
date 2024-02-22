@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import *
+from .models import *
 from datetime import datetime
 import random
 
