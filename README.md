@@ -5,10 +5,10 @@
 Project has been setup and tested on localhost. Make shure to adjust parameters in the `compose.yaml` if you want to deploy the app on the actual server. Also make sure to use actual username and password.
 
 App uses FastAPI and PostgreSQL stack.
-Database can be accessed from HOST:/8080 through Adminer interface.
-db-name: `device_data_db`
-username: `postgres`
-password: `device_data_db_passwd`
+Database can be accessed from HOST:/8080 through Adminer interface with:
+- db-name: `device_data_db`
+- username: `postgres`
+- password: `device_data_db_passwd`
 
 Or by url:
 `postgresql://postgres:device_data_db_passwd@db:5432/device_data_db`
@@ -27,7 +27,7 @@ Statistic can be accessed on HOST:/statistic/ with parameters:
 
 More info about the methods can be found here: HOST:/docs/
 
-Locust stress test info csv files saved at StressTest.
+Locust stress test info files saved at StressTest. Html contains all the info and plots.
 
 
 ### RUS
@@ -58,4 +58,4 @@ Locust stress test info csv files saved at StressTest.
 
 Более подробную информацию о методах можно найти здесь: HOST:/docs/
 
-Файлы с результатами стресс-теста находятся в StressTest
+Файлы с результатами стресс-теста находятся в StressTest. Файл html содержит всю инофрмацию о тестах и удобные для чтения графики.
